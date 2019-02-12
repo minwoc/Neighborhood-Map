@@ -139,10 +139,10 @@ function initMap() {
       markers.push(marker);
       bounds.extend(markers[i].position);
 
-      marker.addListener('click', function(i) {
-        if (this.text == location.name) {
-          location = locations[i];
-        }
+      marker.addListener('click', function(id) {
+        //if (this.id == i) {
+        location = locations[this.id];
+        //}
         vm.setLocation(location);
         populateInfoWindow(this, globalInfowindows);
 
@@ -243,7 +243,7 @@ function makeMarkerIcon(markerColor) {
 var ViewModel = function() {
   var self = this;
 
-  this.locationList = ko.observableArray(locations);
+  self.locationList = ko.observableArray(locations);
   self.wikiElem = ko.observableArray([]);
   //locations.forEach(function(locationItems) {
   //      self.locationList.push( new Loc(locationItems) );
