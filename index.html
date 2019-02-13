@@ -13,23 +13,37 @@
 <body>
   <div class="container">
     <div class="options-box">
-      <input type="text" >
-      <h1>Click to Individually Navigate Popular Places in Seattle:</h1>
-      <ul data-bind ="foreach: locationList">
-        <li data-bind = "text: name, click: $parent.setLocation"></li>
-         <!-- <li data-bind = "text: lng, click: $parent.setLocation"></li> -->
-      </ul>
-      <div>
-        <input id="show-listings" type="button" value="Show All Markers">
-        <input id="hide-listings" type="button" value="Hide All Markers">
-        <hr>
-      </div>
-      <article>
-        <h3>Wikipedia Articles:</h3>
+
+
+      <main class = "type">
+        <h1 class = "title1"> Type in Listed Locations </h1>
+        <p>Location: <input class="inputs" data-bind="textInput: searchItem, valueUpdate: 'afterkeydown'" type="search"/></p>
+      </main>
+
+
+      <section class = "choose">
+        <h1 class = "title2"> Listed Locations (Click)</h1>
+        <ul data-bind ="foreach: locationList">
+          <li data-bind = "text: name, click: $root.setLocation"></li>
+        </ul>
+
+        <div>
+          <input id="show-listings" type="button" value="Show All Markers">
+          <input id="hide-listings" type="button" value="Hide All Markers">
+          <hr>
+        </div>
+      </section>
+
+
+
+    <article class ="articles">
+        <h1 class = "title3">Wikipedia Articles:</h1>
         <ul data-bind="foreach: wikiElem">
         <li data-bind="html: $data"></li>
         </ul>
-      </article>
+    </article>
+
+
     </div>
     <div id="map">
     </div>

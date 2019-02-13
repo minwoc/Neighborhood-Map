@@ -453,34 +453,49 @@ function makeMarkerIcon(markerColor) {
   return markerImage;
 }
 
-//var Loc = function(data) {
+function checkMarker(locations, filtered) {
+  for (var i = 0; i < locations.length; i++) {
+      locations[i].marker.setVisible(false);
+  }
+  for (i = 0; i < filtered.length; i++) {
+      filtered[i].marker.setVisible(true);
+  }
+}
 
-//    this.name = ko.observable(data.name);
-//    this.categoryType = ko.observable(data.categoryType);
-//    this.lat = ko.observable(data.lat);
-//    this.lng = ko.observable(data.lng);
-//    this.address = ko.observable(data.address);
-//    this.info = ko.observable(data.info);
-// }
 var ViewModel = function() {
   var self = this;
-
-  self.locationList = ko.observableArray(locations);
+  var loc = null;
+  //self.locationList = ko.observableArray(locations);
+  self.locationsArray = ko.observableArray([]);
   self.wikiElem = ko.observableArray([]);
-  //locations.forEach(function(locationItems) {
-  //      self.locationList.push( new Loc(locationItems) );
-  // });
+  self.searchItem = ko.observable('');
+
+  locations.forEach(function(location) {
+    self.locationsArray.push(location)
+  })
 
   //this.currentLocation = ko.observable( this.locationList()[0] );
+  self.locationList = ko.computed(function() {
+    var searchItems = self.searchItem().toLowerCase(); //what user types.
+    if (!searchItems) { //If user doesn't type, show the lists's names.
+      loc = self.locationsArray();
+      return loc;
+    } else {
+      loc = ko.utils.arrayFilter(self.locationsArray(), function(location) {
+        return location.name.toLowerCase().includes(searchItems);
+      });
+    }
+    if (loc != null) {
+      checkMarker(locations, loc);
+    }
+    return loc;
+  }, self);
+
 
   self.setLocation = function(clickedLocation) {
      //setLocation's element is locations's name which is clickedLoations..
     populateInfoWindow(clickedLocation.marker, globalInfowindows);
-  //  populateInfoWindow(clickedLocation, largeInfowindow, location)
-  //  window.alert('clickedLocation');
-    //self.loadData(clickedLocation);
-
-  self.wikiElem([]);
+    self.wikiElem([]);
     var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + clickedLocation.categoryType + '&format=json&callback=wikiCallback';
     var wikiRequestTimeout = setTimeout(function(){
         self.wikiElem.push("failed to get wikipedia resources");
@@ -491,14 +506,12 @@ var ViewModel = function() {
         dataType: "jsonp",
         jsonp: "callback",
         success: function(response) {
-
             var articleList = response[1];
             for (var i = 0; i < articleList.length; i++) {
                 articleStr = articleList[i];
                 var url = 'http://en.wikipedia.org/wiki/' + articleStr;
                 self.wikiElem.push('<a href="' + url + '">' + articleStr + '</a>');
             };
-
             clearTimeout(wikiRequestTimeout);
         }
     });
