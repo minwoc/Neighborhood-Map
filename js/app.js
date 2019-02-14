@@ -331,38 +331,40 @@ function initMap() {
         ]
     }
 ];
+    // Buttons to show all the locations.
     document.getElementById('show-listings').addEventListener('click', showListings);
     document.getElementById('hide-listings').addEventListener('click', function() {
       hideMarkers(markers);
     });
+    // Setting the marker icon to default color when there's no action.
     var defaultIcon = makeMarkerIcon('0091ff');
-    // Create a "highlighted location" marker color for when the user
+
     // mouses over the marker.
+    // Setting the marker icon to different color when mouse over the marker.
     var highlightedIcon = makeMarkerIcon('FFFF24');
 
     var bounds = new google.maps.LatLngBounds();
-    //var infowindow = infoWindowCreate();
     var num = 13;
-    // Constructor creates a new map - only center and zoom are required.
-    map = setMap(num, styles);
-
-
-
+    // Calling a function with zoom and styles variables to create a dynamic map.
+    map = setMaps(num, styles);
+    // For loop the locations to set each locations's parameters.
     for (var i = 0; i < locations.length; i++) {
       var location = locations[i];
       var position = new google.maps.LatLng(location.lat, location.lng);
       var title = location.info;
       var text = location.name;
-
-      globalInfowindows = infoWindowCreate(); //created a infowindow inside for loops so it'll be accessible for models in the array any where..?
-
+      // Create a infowindow inside for loops so it'll be accessible for models in the array any where.
+      globalInfowindows = infoWindowCreate();
+      // Create a marker inside for loop to create markers for each locations.
       var marker = setMarker(map, position, title, text, defaultIcon, i);
 
+      // Attach a marker to each location, so that markers can be attached to the locations any where.
       location.marker = marker;
 
       markers.push(marker);
       bounds.extend(markers[i].position);
-
+      // Event listener where user clicks on the marker, it'll call the function View Model to view Wikipedia resources
+      // and open up infowindow for the cliciked marker.
       marker.addListener('click', function(id) {
         location = locations[this.id];
         vm.setLocation(location);
@@ -370,6 +372,7 @@ function initMap() {
 
       });
 
+      // EVent listener to look for any mouses over the marker icons.
       marker.addListener('mouseover', function() {
         this.setIcon(highlightedIcon);
       });
@@ -380,17 +383,17 @@ function initMap() {
   map.fitBounds(bounds);
 } //end of init function
 
-
+// Function to create error message.
 function handleError() {
   alert('There is an error with Google Maps!');
 }
-
+// Function to create infowindow.
 function infoWindowCreate() {
   var infoWindows = new google.maps.InfoWindow();
   return infoWindows
 }
-
-function setMap(num, styles) {
+// Function to create map.
+function setMaps(num, styles) {
   var map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: locations[0].lat, lng: locations[0].lng},
     zoom: num,
@@ -400,6 +403,7 @@ function setMap(num, styles) {
   return map
 }
 
+// Function to create marker.
 function setMarker(map, position, title, text, icon, i) {
   var marker = new google.maps.Marker({
     position: position,
@@ -413,6 +417,7 @@ function setMarker(map, position, title, text, icon, i) {
   return marker;
 }
 
+// Function to create infowindow.
 function populateInfoWindow(marker, infowindow) {
   // Check to make sure the infowindow is not already opened on this marker.
   if (infowindow.marker != marker) {
@@ -426,6 +431,7 @@ function populateInfoWindow(marker, infowindow) {
   }
 }
 
+// Function to show all markers when clicked.
 function showListings() {
   var bounds = new google.maps.LatLngBounds();
   // Extend the boundaries of the map for each marker and display the marker
@@ -435,13 +441,14 @@ function showListings() {
   }
   map.fitBounds(bounds);
 }
-// This function will loop through the listings and hide them all.
+// Function to hide all markers when clicked.
 function hideMarkers(markers) {
   for (var i = 0; i < markers.length; i++) {
     markers[i].setMap(null);
   }
 }
 
+// Function to create colors for the markers.
 function makeMarkerIcon(markerColor) {
   var markerImage = new google.maps.MarkerImage(
     'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor +
@@ -453,66 +460,75 @@ function makeMarkerIcon(markerColor) {
   return markerImage;
 }
 
-function checkMarker(locations, filtered) {
+// Function to filter the markers.
+function checkMarker(locations, loc) {
   for (var i = 0; i < locations.length; i++) {
-      locations[i].marker.setVisible(false);
+    locations[i].marker.setMap(null);
   }
-  for (i = 0; i < filtered.length; i++) {
-      filtered[i].marker.setVisible(true);
+
+  for (i = 0; i < loc.length; i++) {
+    //showListings();
+    loc[i].marker.setMap(map);
+    if(loc == null ) {
+      return showListings();
+    }
   }
 }
 
+// View Model function.
+// View Model creates connections between the HTML and the JavaScript.
 var ViewModel = function() {
   var self = this;
   var loc = null;
-  //self.locationList = ko.observableArray(locations);
-  self.locationsArray = ko.observableArray([]);
-  self.wikiElem = ko.observableArray([]);
+
+  self.manyLocationsArray = ko.observableArray([]);
+  self.resourcesArray = ko.observableArray([]);
   self.searchItem = ko.observable('');
 
+  // Append each location into the empty array.
   locations.forEach(function(location) {
-    self.locationsArray.push(location)
+    self.manyLocationsArray.push(location)
   })
 
-  //this.currentLocation = ko.observable( this.locationList()[0] );
+  // Filtering both lists and markers when user types into the input box.
   self.locationList = ko.computed(function() {
     var searchItems = self.searchItem().toLowerCase(); //what user types.
     if (!searchItems) { //If user doesn't type, show the lists's names.
-      loc = self.locationsArray();
-      return loc;
+      var power = self.manyLocationsArray();
+      return power;
     } else {
-      loc = ko.utils.arrayFilter(self.locationsArray(), function(location) {
+      loc = ko.utils.arrayFilter(self.manyLocationsArray(), function(location) {
         return location.name.toLowerCase().includes(searchItems);
       });
     }
-    if (loc != null) {
+   if(loc != null) {
       checkMarker(locations, loc);
     }
     return loc;
   }, self);
 
-
+  // Opening up the markers and displays the wikipedia resources when lists are clicked on the side.
   self.setLocation = function(clickedLocation) {
      //setLocation's element is locations's name which is clickedLoations..
     populateInfoWindow(clickedLocation.marker, globalInfowindows);
-    self.wikiElem([]);
-    var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + clickedLocation.categoryType + '&format=json&callback=wikiCallback';
-    var wikiRequestTimeout = setTimeout(function(){
-        self.wikiElem.push("failed to get wikipedia resources");
+    self.resourcesArray([]);
+    var types = clickedLocation.categoryType;
+    var wURL = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + types + '&format=json&callback=wikiCallback';
+    var wTimeOut = setTimeout(function(){
+        self.resourcesArray.push("failed to get wikipedia resources");
     }, 8000);
 
     $.ajax({
-        url: wikiUrl,
+        url: wURL,
         dataType: "jsonp",
-        jsonp: "callback",
-        success: function(response) {
-            var articleList = response[1];
-            for (var i = 0; i < articleList.length; i++) {
-                articleStr = articleList[i];
-                var url = 'http://en.wikipedia.org/wiki/' + articleStr;
-                self.wikiElem.push('<a href="' + url + '">' + articleStr + '</a>');
+        success: function(results) {
+            var result = results[1];
+            for (var i = 0; i < result.length; i++) {
+                givenResult = result[i];
+                var url = 'http://en.wikipedia.org/wiki/' + givenResult;
+                self.resourcesArray.push('<a href="' + url + '">' + givenResult + '</a>');
             };
-            clearTimeout(wikiRequestTimeout);
+            clearTimeout(wTimeOut);
         }
     });
     return false;
