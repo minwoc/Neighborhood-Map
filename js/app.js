@@ -381,6 +381,7 @@ function initMap() {
       });
   }
   map.fitBounds(bounds);
+  isMapLoaded = true;
 } //end of init function
 
 // Function to create error message.
@@ -416,6 +417,19 @@ function setMarker(map, position, title, text, icon, i) {
   });
   return marker;
 }
+
+function createMarker(map, locations) {
+  for (var i = 0; i < locations.length; i++) {
+    var location = locations[i];
+    var myLatLng = new google.maps.LatLng(location[2], location[3]);
+    var marker = new google.maps.Marker({
+      position: myLatLng,
+      map: map,
+      title: location[5]
+    });
+  }
+}
+
 
 // Function to create infowindow.
 function populateInfoWindow(marker, infowindow) {
@@ -461,22 +475,25 @@ function makeMarkerIcon(markerColor) {
 }
 
 // Function to filter the markers.
-function checkMarker(locations, loc) {
+function checkMarker(locations, loc, searchItems) {
+
+//loc.marker.setMap(map);
+if(loc.length==0) {
+  loc.marker.setMap(map);
+}
   for (var i = 0; i < locations.length; i++) {
-    locations[i].marker.setMap(null);
+    locations[i].marker.setVisible(false);
   }
 
   for (i = 0; i < loc.length; i++) {
-    //showListings();
-    loc[i].marker.setMap(map);
-    if(loc == null ) {
-      return showListings();
-    }
+    loc[i].marker.setVisible(true);
   }
+
 }
 
 // View Model function.
 // View Model creates connections between the HTML and the JavaScript.
+var i = 0;
 var ViewModel = function() {
   var self = this;
   var loc = null;
@@ -489,23 +506,26 @@ var ViewModel = function() {
   locations.forEach(function(location) {
     self.manyLocationsArray.push(location)
   })
-
   // Filtering both lists and markers when user types into the input box.
   self.locationList = ko.computed(function() {
     var searchItems = self.searchItem().toLowerCase(); //what user types.
-    if (!searchItems) { //If user doesn't type, show the lists's names.
+
+    if (!searchItems&&i==0) { //If user doesn't type, show the lists's names.
+      //showListings();
+      //createMarker(map, locations);
+      i++;
       var power = self.manyLocationsArray();
       return power;
+
     } else {
       loc = ko.utils.arrayFilter(self.manyLocationsArray(), function(location) {
         return location.name.toLowerCase().includes(searchItems);
       });
     }
-   if(loc != null) {
-      checkMarker(locations, loc);
-    }
+    checkMarker(locations, loc, searchItems);
+
     return loc;
-  }, self);
+  });
 
   // Opening up the markers and displays the wikipedia resources when lists are clicked on the side.
   self.setLocation = function(clickedLocation) {
