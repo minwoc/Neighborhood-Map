@@ -331,11 +331,7 @@ function initMap() {
         ]
     }
 ];
-    // Buttons to show all the locations.
-    //document.getElementById('show-listings').addEventListener('click', showListings);
-    //document.getElementById('hide-listings').addEventListener('click', function() {
-    //  hideMarkers(markers);
-    //});
+
     // Setting the marker icon to default color when there's no action.
     var defaultIcon = makeMarkerIcon('0091ff');
 
@@ -388,10 +384,11 @@ function initMap() {
 function handleError() {
   alert('There is an error with Google Maps!');
 }
+
 // Function to create infowindow.
 function infoWindowCreate() {
   var infoWindows = new google.maps.InfoWindow();
-  return infoWindows
+  return infoWindows;
 }
 // Function to create map.
 function setMaps(num, styles) {
@@ -401,7 +398,7 @@ function setMaps(num, styles) {
     styles: styles,
     mapTypeControl: false
   });
-  return map
+  return map;
 }
 
 // Function to create marker.
@@ -500,8 +497,8 @@ var ViewModel = function() {
 
   // Append each location into the empty array.
   locations.forEach(function(location) {
-    self.manyLocationsArray.push(location)
-  })
+    self.manyLocationsArray.push(location);
+  });
   // Filtering both lists and markers when user types into the input box.
   self.locationList = ko.computed(function() {
     var searchItems = self.searchItem().toLowerCase(); //what user types.
@@ -544,14 +541,14 @@ var ViewModel = function() {
                 givenResult = result[i];
                 var url = 'http://en.wikipedia.org/wiki/' + givenResult;
                 self.resourcesArray.push('<a href="' + url + '">' + givenResult + '</a>');
-            };
+            }
             clearTimeout(wTimeOut);
         }
     });
     return false;
-  }
-}
+  };
+};
 
 
-var vm = new ViewModel()
+var vm = new ViewModel();
 ko.applyBindings(vm);

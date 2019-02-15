@@ -5,6 +5,7 @@ It is designed to challenge students to create a convenient user experienced goo
 
 Start:
 Download the project.
+Go to the link on Min's GitHub: https://github.com/minwoc.
 Open index.html.
 
 Reference:

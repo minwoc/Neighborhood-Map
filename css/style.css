@@ -47,6 +47,7 @@ body {
    height: 100%;
    position: relative;
  }
+
  #hide-listings,
  #show-listings {
     width: 48%;
@@ -56,6 +57,8 @@ body {
 .inputs{
   border: solid black;
 }
-.title1, .title2, .title3 {
+.title1,
+.title2,
+.title3 {
   text-align: center;
 }
