@@ -332,10 +332,10 @@ function initMap() {
     }
 ];
     // Buttons to show all the locations.
-    document.getElementById('show-listings').addEventListener('click', showListings);
-    document.getElementById('hide-listings').addEventListener('click', function() {
-      hideMarkers(markers);
-    });
+    //document.getElementById('show-listings').addEventListener('click', showListings);
+    //document.getElementById('hide-listings').addEventListener('click', function() {
+    //  hideMarkers(markers);
+    //});
     // Setting the marker icon to default color when there's no action.
     var defaultIcon = makeMarkerIcon('0091ff');
 
@@ -418,24 +418,13 @@ function setMarker(map, position, title, text, icon, i) {
   return marker;
 }
 
-function createMarker(map, locations) {
-  for (var i = 0; i < locations.length; i++) {
-    var location = locations[i];
-    var myLatLng = new google.maps.LatLng(location[2], location[3]);
-    var marker = new google.maps.Marker({
-      position: myLatLng,
-      map: map,
-      title: location[5]
-    });
-  }
-}
-
 
 // Function to create infowindow.
 function populateInfoWindow(marker, infowindow) {
   // Check to make sure the infowindow is not already opened on this marker.
   if (infowindow.marker != marker) {
     infowindow.marker = marker;
+    infowindow.marker.setAnimation(google.maps.Animation.BOUNCE);
     infowindow.setContent(  '<h2>' + marker.text + '</h2>' + '<div>' + marker.title + '</div>');
     infowindow.open(map, marker);
     // Make sure the marker property is cleared if the infowindow is closed.
@@ -476,19 +465,15 @@ function makeMarkerIcon(markerColor) {
 
 // Function to filter the markers.
 function checkMarker(locations, loc, searchItems) {
-
-//loc.marker.setMap(map);
-if(loc.length==0) {
-  loc.marker.setMap(map);
-}
+  if(loc.length==0) {
+    loc.marker.setMap(map);
+  }
   for (var i = 0; i < locations.length; i++) {
-    locations[i].marker.setVisible(false);
+    locations[i].marker.setMap(null);
   }
-
   for (i = 0; i < loc.length; i++) {
-    loc[i].marker.setVisible(true);
+    loc[i].marker.setMap(map);
   }
-
 }
 
 // View Model function.
@@ -497,6 +482,17 @@ var i = 0;
 var ViewModel = function() {
   var self = this;
   var loc = null;
+
+
+  self.showLists = ko.observable(function() {
+    return showListings();
+  });
+
+  self.hideLists = ko.observable(function() {
+    return hideMarkers(markers);
+  });
+
+
 
   self.manyLocationsArray = ko.observableArray([]);
   self.resourcesArray = ko.observableArray([]);
@@ -517,13 +513,14 @@ var ViewModel = function() {
       var power = self.manyLocationsArray();
       return power;
 
-    } else {
+    } else { //user types something..
       loc = ko.utils.arrayFilter(self.manyLocationsArray(), function(location) {
         return location.name.toLowerCase().includes(searchItems);
       });
     }
-    checkMarker(locations, loc, searchItems);
-
+    if(loc != null) { //loc needs to have a value otherwise..
+      checkMarker(locations, loc, searchItems);
+    }
     return loc;
   });
 
