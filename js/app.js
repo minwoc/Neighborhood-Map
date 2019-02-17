@@ -460,41 +460,38 @@ function makeMarkerIcon(markerColor) {
   return markerImage;
 }
 
+
 // Function to filter the markers.
-function checkMarker(locations, loc, searchItems) {
-  if(loc.length==0) {
-    loc.marker.setMap(map);
-  }
-  for (var i = 0; i < locations.length; i++) {
-    locations[i].marker.setMap(null);
-  }
-  for (i = 0; i < loc.length; i++) {
-    loc[i].marker.setMap(map);
+function checkMarker(locations, loc) {
+  if(loc==loc) {
+    //what deletes the markers that's not in the list.
+    for (var i = 0; i < locations.length; i++) {
+      locations[i].marker.setMap(null);
+    }
+    //what shows the markers that's in the list.
+    for (i = 0; i < loc.length; i++) {
+      loc[i].marker.setMap(map);
+    }
+  }else{
+    loc = null;
+    loc.marker.setMap(null);
   }
 }
-
 // View Model function.
 // View Model creates connections between the HTML and the JavaScript.
 var i = 0;
 var ViewModel = function() {
   var self = this;
   var loc = null;
-
-
   self.showLists = ko.observable(function() {
     return showListings();
   });
-
   self.hideLists = ko.observable(function() {
     return hideMarkers(markers);
   });
-
-
-
   self.manyLocationsArray = ko.observableArray([]);
   self.resourcesArray = ko.observableArray([]);
   self.searchItem = ko.observable('');
-
   // Append each location into the empty array.
   locations.forEach(function(location) {
     self.manyLocationsArray.push(location);
@@ -502,22 +499,20 @@ var ViewModel = function() {
   // Filtering both lists and markers when user types into the input box.
   self.locationList = ko.computed(function() {
     var searchItems = self.searchItem().toLowerCase(); //what user types.
-
-    if (!searchItems&&i==0) { //If user doesn't type, show the lists's names.
-      //showListings();
-      //createMarker(map, locations);
+     //If user doesn't type, show the lists's names.
+     //Increment by 1 right after user types to lose access of going into the if statement.
+    if (!searchItems && i==0) {
       i++;
       var power = self.manyLocationsArray();
       return power;
-
-    } else { //user types something..
+    } else {
       loc = ko.utils.arrayFilter(self.manyLocationsArray(), function(location) {
         return location.name.toLowerCase().includes(searchItems);
       });
     }
-    if(loc != null) { //loc needs to have a value otherwise..
-      checkMarker(locations, loc, searchItems);
-    }
+   //loc needs to have a value otherwise..
+
+    checkMarker(locations, loc);
     return loc;
   });
 
@@ -548,6 +543,9 @@ var ViewModel = function() {
     return false;
   };
 };
+
+//loc is something you type and it filters.
+//need to return loc when user types and it doesn't match any of the characters in the input.
 
 
 var vm = new ViewModel();

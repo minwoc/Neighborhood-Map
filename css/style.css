@@ -6,6 +6,22 @@ body {
   font-family: 'Raleway', sans-serif;
 }
 
+@media screen and (min-width: 700px) {
+  .body {
+    width: 1500px;
+    margin-left: auto;
+    margin-right: auto;
+
+  }
+
+.icon{
+  width: 50px;
+  height: 40%;
+  clear: right;
+  margin-left: 50px;
+  margin-top: 20px;
+}
+
 
 #map {
   bottom:0px;
@@ -25,12 +41,15 @@ body {
   padding: 10px 10px 30px 10px;
   text-align: left;
   width: 340px;
-
 }
 
 .type {
   border: solid gold;
   background: lightblue;
+}
+
+.search{
+  display: flex;
 }
 
 .choose{

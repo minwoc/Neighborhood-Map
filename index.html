@@ -10,40 +10,31 @@
 
 </head>
 
-<body>
+<body class = "body">
   <div class="container">
     <div class="options-box">
-
-
       <main class = "type">
         <h1 class = "title1"> Type in Listed Locations </h1>
+        <section  class = "search">
         <p>Location: <input class="inputs" data-bind="textInput: searchItem, valueUpdate: 'afterkeydown'" type="search"/></p>
       </main>
-
-
       <section class = "choose">
         <h1 class = "title2"> Listed Locations (Click)</h1>
         <ul data-bind ="foreach: locationList">
           <li data-bind = "text: name, click: $root.setLocation"></li>
         </ul>
-
         <div>
           <input id = "show-listings" data-bind="click: showLists()" type="button" value = "Show All Markers" />
           <input id = "hide-listings" data-bind="click: hideLists()" type="button" value = "Hide All Markers" />
           <hr>
         </div>
+        <article class ="articles">
+            <h1 class = "title3">Wikipedia Articles:</h1>
+            <ul data-bind="foreach: resourcesArray">
+            <li data-bind="html: $data"></li>
+            </ul>
+        </article>
       </section>
-
-
-
-    <article class ="articles">
-        <h1 class = "title3">Wikipedia Articles:</h1>
-        <ul data-bind="foreach: resourcesArray">
-        <li data-bind="html: $data"></li>
-        </ul>
-    </article>
-
-
     </div>
     <div id="map">
     </div>
